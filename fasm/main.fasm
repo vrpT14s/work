@@ -1,0 +1,93 @@
+format ELF64
+
+SYS_read equ 0
+SYS_write equ 1
+SYS_open equ 2
+SYS_close equ 3
+SYS_stat equ 4
+SYS_fstat equ 5
+SYS_lstat equ 6
+SYS_poll equ 7
+SYS_lseek equ 8
+SYS_mmap equ 9
+
+SYS_exit equ 60
+STDOUT equ 1
+
+macro exit exit_code
+{
+	mov rax, SYS_exit
+	mov rdi, exit_code
+	syscall
+}
+
+macro write fd, buf, count
+{
+	mov rax, SYS_write
+	mov rdi, fd
+	mov rsi, buf
+	mov rdx, count
+	syscall
+}
+
+macro stringset string_lbl, string
+{
+	string_lbl db string,0xA
+	string_lbl#.size = $-string_lbl
+}
+
+section '.data'
+	temp_quad_lower dq "yeah"
+	temp_quad_higher dq "yeah"
+
+macro print_rax
+{
+section '.text'
+	repeat 8
+		mov cl, al
+		and cl, 0xf
+		add cl, '0'
+		dbl_p = % + % - 2
+		mov byte [temp_quad_lower + dbl_p], cl
+		shr rax, 4
+	end repeat
+}
+
+macro print msg
+{
+	local msg_label, msg_length
+section '.data'
+	msg_label db msg,0xA
+	msg_length = $ - msg_label
+section '.text'
+	write STDOUT, msg_label, msg_length
+}
+
+macro read fd, buf, count
+{
+	mov rax, SYS_read
+	mov rdi, fd
+	mov rsi, buf
+	mov rdx, count
+	syscall
+}
+
+section '.text' executable
+start:
+	push rbp
+	mov rbp, rsp
+
+	mov rax, 0x3132333435363738
+	push rax
+	write STDOUT, rsp, 8
+	cmp rax, 0
+	jle error
+	print ""
+	print "Okay, program done."
+	exit 0
+
+error:
+	print "There was an error."
+	exit 1
+
+section '.data' writeable

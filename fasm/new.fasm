@@ -1,0 +1,19 @@
+format ELF64 executable
+entry start
+
+segment readable executable
+start:
+	mov	eax,4
+	mov	ebx,1
+	mov	ecx,msg
+	mov	edx,msg_size
+
+	mov	eax,1
+	xor	ebx,ebx
+	ret
+
+segment readable writeable
+
+
+msg db "Hello world!",0xA
+msg_size = $-msg

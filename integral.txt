@@ -1,0 +1,2 @@
+Tue Sep 26 11:40:52 PM UTC 2023
+was thinking about integral, storing as normal binary tree (and for single operation just store the right as null or whatever, ignore the right). Easy to simplify constant things just recursively. would need some other simplifications. Got confused by how to do the graph search.
